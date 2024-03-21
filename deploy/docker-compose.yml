@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  freeswitch:
+    build: ../services/freeswitch
+    restart: always
+    network_mode: host
+    volumes:
+      - ./data:/data
+
+  frontend:
+    build: ../services/frontend
+    restart: always
+    network_mode: host

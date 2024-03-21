@@ -1,5 +1,7 @@
 FROM debian:12-slim
 
+ARG SIP_PASSWORD=FS_password_1234
+
 RUN apt-get update && \
     apt-get install -yq gnupg2 wget lsb-release git build-essential autoconf libtool pkg-config cmake nasm \
     libtiff-dev libssl-dev libsqlite3-dev libcurl4-openssl-dev libpcre3-dev libspeex-dev libspeexdsp-dev \
@@ -51,6 +53,18 @@ RUN cd /usr/src/freeswitch && \
     make -j && \
     make install
 
-RUN ldconfig
+RUN ldconfig && mkdir -p /data/certs
+
+RUN sed -i -E 's|(<!--)?<param name="tls-cert-dir" value="[^"]*"/>(-->)?|<param name="tls-cert-dir" value="/data/certs"/>|' \
+    /usr/local/freeswitch/conf/sip_profiles/internal.xml && \
+    sed -i -E 's#(<!--)?<load module="mod_(signalwire|pgsql)"/>(-->)?#<!--<load module="mod_(\2)"/>-->#' \
+    /usr/local/freeswitch/conf/autoload_configs/modules.conf.xml && \
+    sed -i -E 's|(<!--)?<load module="mod_h26x"/>(-->)?|<load module="mod_h26x"/>|' \
+    /usr/local/freeswitch/conf/autoload_configs/modules.conf.xml && \
+    sed -i -E 's!<X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=[^"]*"/>!<X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=H264,OPUS,G722,PCMU,PCMA"/>!' \
+    /usr/local/freeswitch/conf/vars.xml && \
+    sed -i -E 's!<X-PRE-PROCESS cmd="set" data="default_password=[^"]*"/>!<X-PRE-PROCESS cmd="set" data="default_password=$SIP_PASSWORD"/>!' \
+    /usr/local/freeswitch/conf/vars.xml && \
+    rm -r /usr/local/freeswitch/conf/sip_profiles/*-ipv6*
 
 CMD ["/usr/local/freeswitch/bin/freeswitch"]

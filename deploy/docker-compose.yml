@@ -2,13 +2,23 @@ version: "3"
 
 services:
   freeswitch:
-    build: ../services/freeswitch
-    restart: always
+    build:
+      context: ../services/freeswitch
+      dockerfile: ./Dockerfile
+      args:
+        - SIP_PASSWORD
     network_mode: host
-    volumes:
-      - ./data:/data
+    restart: always
 
   frontend:
-    build: ../services/frontend
-    restart: always
+    build:
+      context: ../services/frontend
+      dockerfile: ./Dockerfile
+      args:
+        - VITE_SIP_SERVER_IP
+        - VITE_SIP_SERVER_URL
+        - SERVER_IP
     network_mode: host
+    env_file:
+      - ../services/frontend/.env
+    restart: always

@@ -21,5 +21,6 @@ RUN npm run build
 RUN rm -rf ./node_modules
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+RUN sed -i -E "s/SERVER_IP/$VITE_SIP_SERVER_IP/" /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

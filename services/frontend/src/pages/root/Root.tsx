@@ -22,9 +22,15 @@ export const Root = () => {
     setSipOptions(options);
   }, []);
 
+  const handleDisconnect = useCallback(() => {
+    setSipOptions(null);
+  }, []);
+
   return (
     <div className={styles.container}>
-      {sipOptions ? <Call sipUserOptions={sipOptions} /> : <Login onConnect={handleConnect} />}
+      {sipOptions
+        ? <Call sipUserOptions={sipOptions} onUnregistered={handleDisconnect} />
+        : <Login onConnect={handleConnect} />}
     </div>
   )
 }

@@ -8,18 +8,18 @@ interface Props {
 }
 
 export const Login = ({onConnect}: Props) => {
-  const [user, setUser] = useState('');
+  const [user, setUser] = useState('1000');
   const [password, setPassword] = useState('');
 
   const handleConnect = useCallback(() => {
     onConnect(user, password);
-  }, [onConnect]);
+  }, [onConnect, user, password]);
 
   return (
-    <div className={styles.container}>
+    <form className={styles.container} onSubmit={handleConnect}>
       <TextField value={user} onChange={(e) => setUser(e.target.value)} label='User' />
       <TextField value={password} onChange={(e) => setPassword(e.target.value)} label='Password' type="password" />
-      <Button onClick={handleConnect}>Connect</Button>
-    </div>
+      <Button type='submit'>Connect</Button>
+    </form>
   )
 }

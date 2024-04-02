@@ -1,36 +1,33 @@
-import React, { useState, useCallback } from 'react';
-import { SimpleUserOptions } from 'sip.js/lib/platform/web';
-
-import { Login } from '../../components/login/Login';
+import useQueryString from 'src/utils/hooks/useQueryString';
 import { Call } from '../../components/call/Call';
-import { vars } from '../../configs/vars';
 
 import styles from './Root.module.scss';
 
 export const Root = () => {
-  const [sipOptions, setSipOptions] = useState<SimpleUserOptions | null>(null);
+  const { domain, url, user, password } = useQueryString();
 
-  const handleConnect = useCallback((user: string, password: string) => {
-    const options: SimpleUserOptions = {
-      aor: `sip:${user}@${vars.sipServer}`,
-      userAgentOptions: {
-        displayName: user,
-        authorizationPassword: password,
-        authorizationUsername: user,
-      },
-    };
-    setSipOptions(options);
-  }, []);
+  let error = '';
 
-  const handleDisconnect = useCallback(() => {
-    setSipOptions(null);
-  }, []);
+  if (typeof domain !== 'string') {
+    error = 'Domain is missing';
+  } else if (typeof url !== 'string') {
+    error = 'URL is missing';
+  } else if (typeof user !== 'string') {
+    error = 'Username is missing';
+  } else if (typeof password !== 'string') {
+    error = 'Password is missing';
+  }
 
   return (
     <div className={styles.container}>
-      {sipOptions
-        ? <Call sipUserOptions={sipOptions} onUnregistered={handleDisconnect} />
-        : <Login onConnect={handleConnect} />}
+      {error
+        ? (<h1>{error}</h1>)
+        : (<Call
+          domain={domain as string}
+          url={url as string}
+          user={user as string}
+          password={password as string}
+        />)}
     </div>
   )
 }

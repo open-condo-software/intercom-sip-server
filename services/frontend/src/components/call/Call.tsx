@@ -88,6 +88,10 @@ export const Call = ({ url, domain, user, password }: Props) => {
             iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
           },
         },
+        transportOptions: {
+          wsServers: url,
+          keepAliveInterval: 10,
+        },
       },
     });
     sipUserRef.current.delegate = {

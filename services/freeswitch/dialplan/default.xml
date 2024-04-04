@@ -31,7 +31,7 @@
     </extension>
 
     <extension name="Local_Extension">
-      <condition field="destination_number" expression="^(10[01][0-9])$">
+      <condition field="destination_number" expression="^(.*)$">
         <action application="export" data="dialed_extension=$1"/>
         <action application="set" data="ringback=${us-ring}"/>
         <action application="set" data="transfer_ringback=$${hold_music}"/>

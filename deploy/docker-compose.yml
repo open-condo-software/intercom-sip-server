@@ -5,8 +5,6 @@ services:
     build:
       context: ../services/freeswitch
       dockerfile: ./Dockerfile
-      args:
-        - SIP_PASSWORD
     network_mode: host
     restart: always
 
@@ -15,10 +13,8 @@ services:
       context: ../services/frontend
       dockerfile: ./Dockerfile
       args:
-        - VITE_SIP_SERVER_IP
-        - VITE_SIP_SERVER_URL
-        - SERVER_IP
+        - SIP_SERVER_IP
     network_mode: host
     env_file:
-      - ../services/frontend/.env
+      - .env
     restart: always

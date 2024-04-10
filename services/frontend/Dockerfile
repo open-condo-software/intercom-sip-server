@@ -9,18 +9,14 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY . /app
 
-ARG VITE_SIP_SERVER_IP
-ARG VITE_SIP_SERVER_URL
+ARG SIP_SERVER_IP
 
-ENV VITE_SIP_SERVER_IP=$VITE_SIP_SERVER_IP
-ENV VITE_SIP_SERVER_URL=$VITE_SIP_SERVER_URL
-
-# RUN printenv >> .env
+ENV SIP_SERVER_IP=$SIP_SERVER_IP
 
 RUN npm run build
 RUN rm -rf ./node_modules
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-RUN sed -i -E "s/SERVER_IP/$VITE_SIP_SERVER_IP/" /etc/nginx/conf.d/default.conf
+RUN sed -i -E "s/SERVER_IP/$SIP_SERVER_IP/" /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

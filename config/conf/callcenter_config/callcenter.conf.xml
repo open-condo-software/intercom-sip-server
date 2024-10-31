@@ -1,0 +1,16 @@
+<configuration name="callcenter.conf" description="CallCenter">
+  <settings>
+    <param name="truncate-agents-on-load" value="true"/>
+    <param name="truncate-tiers-on-load" value="true"/>
+  </settings>
+
+  <queues>
+
+  </queues>
+
+  <agents>
+  </agents>
+  <tiers>
+  </tiers>
+
+</configuration> 

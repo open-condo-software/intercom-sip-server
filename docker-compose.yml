@@ -1,0 +1,25 @@
+services:
+  sip-server:
+    build: .
+    image: intercom-prod-sip-server_main:latest
+    network_mode: host
+    volumes:
+      - ./output-users:/usr/local/freeswitch/conf/directory/autousers/
+      - ./volume-configs:/usr/local/freeswitch/conf/callcenter_config/
+    restart: always
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2048m"
+  
+  stun-server:
+    image: coturn/coturn:latest
+    network_mode: host
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2048m"
+

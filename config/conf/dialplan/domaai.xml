@@ -1,0 +1,29 @@
+<include>
+  <context name="intercoms-main">
+    <extension name="call-no-transcoding">
+      <condition regex="all">
+      <regex field="${X-Doma-AI-Type}" expression="^intercom$" />
+      <regex field="${sip_h_X-Doma-No-Transcoding}" expression="^Yes$" />
+        <action application="answer"/>
+        <action application="set" data="media_mix_inbound_outbound_codecs=false"/>
+        <action application="set" data="inherit_codec=true"/>
+        <action application="set" data="cc_export_vars=media_mix_inbound_outbound_codecs,inherit_codec"/>
+        <action application="callcenter" data="${destination_number}@default"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+    <extension name="call-with-transcoding">
+      <condition field="${X-Doma-AI-Type}" expression="^intercom$">
+        <action application="answer"/>
+        <action application="set" data="media_mix_inbound_outbound_codecs=true"/>
+        <action application="set" data="inherit_codec=false"/>
+        <action application="set" data="absolute_codec_string=OPUS,G722,PCMU,PCMA,VP8,telephone-event@8000h"/>
+        <action application="set" data="sip_h_Session-Expires=3600"/>
+        <action application="set" data="sip_h_Min-SE=1800"/>
+        <action application="set" data="cc_export_vars=media_mix_inbound_outbound_codecs,inherit_codec,absolute_codec_string,sip_h_Min-SE,sip_h_Session-Expires"/>
+        <action application="callcenter" data="${destination_number}@default"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+  </context>
+<include>

@@ -1,33 +1,40 @@
 # intercom-sip-server
-An open example implementing a SIP server for an intercom
 
-# Deploy server
+docker-compose для развертывания
 
-To deploy project, create file `deploy/.env` from example, adjust settings and use `deploy.sh` from the project root.
+## Build
 
-Following ports should be accessible on server:
- - 80 (for HTTP)
- - 5060 (for SIP)
- - 16000-16999 (for RTP media)
+Базовая команда выглядит так:
+```sh
+sudo docker compose build
+```
 
-# Run frontend
+## Configuration
 
-After deploy, frontend and SIP over WebSocket will be on HTTP port 80 on the server. It's preferred to set up proxy with HTTPS in front of it.
-The client app should navigate to `https://{PROXY_URL}/?user={USER_NUMBER}&password={USER_PASSWORD}&domain={EXTERNAL_IP}&url={WS_ENDPOINT}`.
+Конфигурация должна быть прописана .env:
+```env
+SOCKET_PASSWORD=
+SIP_PASSWORD=
+SIP_IP=
+```
 
-External IP could be acquired by running command `docker exec -it doma-freeswitch-1 /usr/local/freeswitch/bin/fs_cli -x 'sofia status profile internal'` on deployed server in field `Ext-RTP-IP`.
+- `SIP_PASSWORD` - Пароль от тестовых учёток SIP
+- `SOCKET_PASSWORD` - Пароль от сокета mod_event_socket
+- `SIP_IP` - публичный IP контейнера, по которому его можно зарезольвить. Используется для SDP и прочих вещей.
 
-For example, if your server is deployed on IP `192.168.10.42` and is behind proxy on `https://sip.example.com/`
+## Подключение к сокету
 
-    user = 1000
-    password = 1234
-    domain = 192.168.10.42
-    url = wss://sip.example.com/sip (Note wss instead of https)
+```sh
+sudo docker compose exec -it sip-server /usr/local/freeswitch/bin/fs_cli -rRS --password ${SOCKET_PASSWORD}
+```
 
-All url parameters should be url-encoded.
+## Порты
 
-# Users import script
-
-Prepare `.csv` file with pairs of `number,password` of users, and run `cd scripts && node importUsers.js /path/to/users.csv`. This script will import users in running instance of the server. 
-
-Note: if container was rebuilt, it's required to import users again.
+Контейнер использует следующие порты:
+- `8021` для mod_event_socket
+- `5060` для SIP (нужно открыть)
+- `5061` для SIP over TLS
+- `5080` для SIP
+- `24000`-`25000` для RTP (нужно открыть)
+- `4443` WSS mod_sofia (используется самоподписанный сертификат)
+- `7443` WS mod_sofia

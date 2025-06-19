@@ -1,0 +1,29 @@
+<include>
+  <context name="intercoms-main">
+    <extension name="call-no-transcoding">
+      <condition regex="all">
+        <regex field="${X-Doma-AI-Type}" expression="^intercom$" />
+        <regex field="${sip_h_User-Agent}" expression="^HikVision$" />
+        <action application="log" data="DEBUG no transcoding sip_h_User-Agent=[${sip_h_User-Agent}], sip_user_agent=[${sip_user_agent}]"/>
+        <action application="set" data="media_mix_inbound_outbound_codecs=false"/>
+        <action application="set" data="inherit_codec=true"/>
+        <action application="set" data="cc_export_vars=media_mix_inbound_outbound_codecs,inherit_codec"/>
+        <action application="socket" data="127.0.0.1:7000 async full"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+    <extension name="call-with-transcoding">
+      <condition field="${X-Doma-AI-Type}" expression="^intercom$">
+        <action application="log" data="DEBUG with transcoding sip_h_User-Agent=[${sip_h_User-Agent}], sip_user_agent=[${sip_user_agent}]"/>
+        <action application="set" data="media_mix_inbound_outbound_codecs=true"/>
+        <action application="set" data="inherit_codec=false"/>
+        <action application="set" data="absolute_codec_string=OPUS,G722,PCMU,PCMA,VP8,telephone-event@8000h"/>
+        <action application="set" data="sip_h_Session-Expires=3600"/>
+        <action application="set" data="sip_h_Min-SE=1800"/>
+        <action application="set" data="cc_export_vars=media_mix_inbound_outbound_codecs,inherit_codec,absolute_codec_string,sip_h_Min-SE,sip_h_Session-Expires"/>
+        <action application="socket" data="127.0.0.1:7000 async full"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+  </context>
+<include>

@@ -1,0 +1,13 @@
+{
+  "name": "on_call",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "22.15.24",
+    "typescript": "5.8.3"
+  },
+  "dependencies": {
+    "esl": "11.2.1"
+  }
+}

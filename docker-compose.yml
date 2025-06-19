@@ -1,0 +1,55 @@
+services:
+  sip-server:
+    build: .
+    # image: ${REGISTRY}sip-server:1.0.2
+    network_mode: host
+    volumes:
+      - ./output-users:/usr/local/freeswitch/conf/directory/autousers/
+      - ./volume-configs:/usr/local/freeswitch/conf/callcenter_config/
+    restart: always
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2048m"
+    depends_on:
+      - sip-esl
+    healthcheck:
+      test: ["CMD", "pgrep", "freeswitch"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sip-esl:
+    build: on_call
+    restart: always
+    ports:
+      - 7000:7000
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2048m"
+
+  generate-users:
+    image: python:3.10-alpine
+    depends_on:
+      sip-server:
+        condition: service_healthy
+    volumes:
+      - ./generate_users.py:/generate_users.py
+      - ./input-users:/input-users
+      - ./output-users:/output-users
+    command: ["python3", "generate_users.py"]
+  
+  stun-server:
+    image: coturn/coturn:latest
+    network_mode: host
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2048m"
+
